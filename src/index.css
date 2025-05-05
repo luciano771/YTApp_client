@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #9c2222;
+}
+/* Scrollbar estilizada */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #b91c1c;
+  border-radius: 10px;
+}
+
+/* Estilos globales para el scroll */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #b91c1c #1f1f1f; /* thumb y track en Firefox */
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+html::-webkit-scrollbar {
+  width: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+
+html::-webkit-scrollbar-thumb {
+  background-color: #b91c1c;
+  border-radius: 10px;
+}
+
