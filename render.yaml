@@ -1,0 +1,7 @@
+services:
+  - type: static
+    name: yt-client
+    env: node
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    nodeVersion: 20.11.1
