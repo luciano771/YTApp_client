@@ -1,17 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import Button from "../components/Button"; 
+import { useLocation } from "react-router-dom"; 
 
 const Topbar = () => {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const handleNew = () => {
-    navigate(("/tasks/new"));
-  };
+  // const handleNew = () => {
+  //   navigate(("/tasks/new"));
+  // };
 
-  const handleMenu = () => {
-    navigate(("/menus"));
-  };
+  // const handleMenu = () => {
+  //   navigate(("/menus"));
+  // };
 
 
   return (
