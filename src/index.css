@@ -37,3 +37,36 @@ html::-webkit-scrollbar-thumb {
   border-radius: 10px;
 }
 
+.TagContainer
+{ 
+  width: 100%; 
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.Intag
+{
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 4px;
+  background-color: #00b963
+}
+
+.Extag
+{
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 4px;
+  background-color: #b91c1c;
+}
+ 
+
+.delete-btn {
+  background: none;
+  border: none;
+  margin-left: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white; 
+}

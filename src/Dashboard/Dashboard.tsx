@@ -1,12 +1,15 @@
-import { TextField, Button, Input } from "@mui/material"; 
+import { TextField, Button, Input, MenuItem, Select, InputLabel } from "@mui/material"; 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs"; 
-import utc from "dayjs/plugin/utc";
+import utc from "dayjs/plugin/utc";  
+import { useEffect } from 'react';
 
-dayjs.extend(utc); // Habilita el método `.utc()`
+ 
+
+dayjs.extend(utc);  
 
 type Video = {
    videoId: string;
@@ -21,16 +24,13 @@ type Video = {
 const Dashboard = () => {
  
    const [mostrar, setMostrar] = useState(false); 
-   const [includeWords, setIncludeWords] = useState("");
    const [search, setSearch] = useState(""); 
-   const [excludeWords, setExcludeWords] = useState("");
    const [language, setLanguage] = useState("");
    const [regionCode, setRegionCode] = useState("");
    const [publishedAfter, setPublishedAfter] = useState<Dayjs | null>(null);
    const [data, setData] = useState<Video[]>([]);
    
-   console.log(search + ","  + includeWords,excludeWords,language,regionCode,dayjs(publishedAfter).utc().format("YYYY-MM-DDTHH:mm:ss") + "Z")
-   
+    
    const buscarVideos = async ({
       includeWords,
       search,
@@ -55,8 +55,8 @@ const Dashboard = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            include: includeWords + "," + search,
-            exclude: excludeWords,
+            include: tagsInWords.join(",") + "," + search,
+            exclude: tagsExWords.join(","),
             regionCode,
             relevanceLanguage: language,
             publishedAfter:  publishedAfter
@@ -90,6 +90,65 @@ const Dashboard = () => {
       }
     };
 
+    const [tagsInWords, setTagsInWords] = useState([""]);
+    const [includeWords, setIncludeWords] = useState("");
+    
+    const addIncludeTag = () =>{  
+      if(!includeWords) return;
+      setTagsInWords([...tagsInWords, includeWords]);
+      setIncludeWords("");
+    }
+    const removeIncludeTag = (indexToRemove: number): void => {
+      setTagsInWords(tagsInWords.filter((_, index) => index !== indexToRemove));
+    };
+    
+    const [tagsExWords, setTagsExWords] = useState([""]);
+    const [excludeWords, setExcludeWords] = useState("");
+
+    const addExcludeTag = () =>{  
+      if(!excludeWords) return;
+      setTagsExWords([...tagsExWords, excludeWords]);
+      setExcludeWords("");
+    }
+    const removeExcludeTag = (indexToRemove: number): void => {
+      setTagsExWords(tagsExWords.filter((_, index) => index !== indexToRemove));
+    };
+    
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const name = e.currentTarget.name; 
+        if (name === "include" && includeWords.trim() !== "") {
+          addIncludeTag();
+        } else if (name === "exclude" && excludeWords.trim() !== "") {
+          addExcludeTag();
+        }
+      }
+    };
+    
+    const [regionCodeJson, setRegionCodeJson] = useState<Record<string, string>>({}); 
+  
+    useEffect(() => {
+      fetch('/regionCode')
+        .then(res => res.json())
+        .then(data => setRegionCodeJson(data))
+        .catch(err => console.error("Error cargando JSON:", err));
+    }, []);
+
+    const [languageJson, setLanguageJson] = useState<Record<string, string>>({}); 
+  
+    useEffect(() => {
+      fetch('/language')
+        .then(res => res.json())
+        .then(data => setLanguageJson(data))
+        .catch(err => console.error("Error cargando JSON:", err));
+    }, []);
+    
+    console.log(tagsInWords.join(","))
+ 
+
+    // console.log(search + ","  + includeWords,excludeWords,language,regionCode,dayjs(publishedAfter).utc().format("YYYY-MM-DDTHH:mm:ss") + "Z")
+
     return (
       <div className="flex flex-col gap-10 items-center justify-center "> 
           <div className="p-6 border border-red-900 rounded shadow space-y-4 w-full max-w-xl">
@@ -109,11 +168,66 @@ const Dashboard = () => {
             Search
          </Button>
          </div>
-         <div className="grid grid-cols-2 gap-4 m-2 ">
-            <Input placeholder="Include words" value={includeWords} onChange={(e) => setIncludeWords(e.target.value)} />
-            <Input placeholder="Exclude words" value={excludeWords} onChange={(e) => setExcludeWords(e.target.value)} />
-            <Input placeholder="Language" value={language} onChange={(e) => setLanguage(e.target.value)} /> 
-            <Input placeholder="Region Code" value={regionCode} onChange={(e) => setRegionCode(e.target.value)} />
+
+          <div className="grid grid-cols-2 gap-4 m-2 ">
+
+            <div className="TagContainer">
+            {tagsInWords.map((tag, index) =>
+                tag !== "" && (
+                  <div key={index} className="Intag"> 
+                    {tag}
+                    <button className="delete-btn"  onClick={() => removeIncludeTag(index)}>✖</button>
+                  </div>
+                  
+                )
+              )} 
+              <Input placeholder="Include words" name="include" value={includeWords} onChange={(e) => setIncludeWords(e.target.value)}  onKeyDown={handleKeyDown} /> 
+            </div> 
+
+            <div className="TagContainer">
+            {tagsExWords.map((tag, index) =>
+                tag !== "" && (
+                  <div key={index} className="Extag"> 
+                    {tag}
+                    <button className="delete-btn" onClick={() => removeExcludeTag(index)}>✖</button>
+                  </div>
+                  
+                )
+              )} 
+              <Input placeholder="Exclude words" name="exclude" value={excludeWords} onChange={(e) => setExcludeWords(e.target.value)}  onKeyDown={handleKeyDown} /> 
+            </div>
+              
+            <Select
+              labelId=""
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              displayEmpty   
+              renderValue={(selected) =>
+                selected !== "" ? languageJson[selected] : "Select Language"
+              }
+            > 
+              {Object.entries(languageJson).map(([code, name]) => (
+                <MenuItem key={code} value={code}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+            
+            <Select
+              labelId=""
+              value={regionCode}
+              onChange={(e) => setRegionCode(e.target.value)}
+              displayEmpty  
+              renderValue={(selected) =>
+                selected !== "" ? regionCodeJson[selected] : "Select Country"
+              }
+            > 
+              {Object.entries(regionCodeJson).map(([code, name]) => (
+                <MenuItem key={code} value={code}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                <DatePicker
@@ -122,8 +236,7 @@ const Dashboard = () => {
                onChange={(newValue) => setPublishedAfter(newValue)}
                />
             </LocalizationProvider>
-			 
-          
+			  
 		    </div>
          </div>
          {mostrar && setData.length > 0 && (
