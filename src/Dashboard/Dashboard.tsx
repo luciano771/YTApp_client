@@ -5,7 +5,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs"; 
 import utc from "dayjs/plugin/utc";  
-import { useEffect } from 'react'; 
+import { useEffect } from 'react';  
+import toast from "react-hot-toast";
 
 dayjs.extend(utc);  
 
@@ -25,58 +26,56 @@ const Dashboard = () => {
    const [search, setSearch] = useState(""); 
    const [language, setLanguage] = useState("");
    const [regionCode, setRegionCode] = useState("");
-   const [publishedAfter, setPublishedAfter] = useState<Dayjs | null>(null);
+   const [publishedAfter, setPublishedAfter] = useState<Dayjs  | null>(dayjs());
    const [data, setData] = useState<Video[]>([]);
    
     
-   const buscarVideos = async ({
-      includeWords,
-      search,
-      excludeWords,
+   const buscarVideos = async ({ 
+      search, 
       regionCode,
       language,
       publishedAfter,
     }: {
-      includeWords: string;
       search: string;
-      excludeWords: string;
       regionCode: string;
       language: string;
       publishedAfter: Dayjs | null;
-    }): Promise<Video[]> => {
-      console.log(includeWords,excludeWords,);
-
-      try {
-        const response = await fetch("https://ytapp-4ecd.onrender.com/search/search", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            include: tagsInWords.join(",") + "," + search,
-            exclude: tagsExWords.join(","),
-            regionCode,
-            relevanceLanguage: language,
-            publishedAfter:  publishedAfter
-            ? dayjs(publishedAfter).utc().format("YYYY-MM-DDTHH:mm:ss") + "Z"
-            : undefined
-          }),
-        });
-    
-        const data = await response.json();
-        console.log(data); 
-        return data as Video[]; // le decís al compilador que esperás un array de Video
-      } catch (err) {
-        console.error("Error al hacer la petición:", err);
-        return [];
+    }): Promise<Video[]> => { 
+      if(validateParameters())
+      {
+        try {
+          const response = await fetch("https://ytapp-4ecd.onrender.com/search/search", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              include: tagsInWords.join(",") + "," + search,
+              exclude: tagsExWords.join(","),
+              regionCode,
+              relevanceLanguage: language,
+              publishedAfter:  publishedAfter
+              ? dayjs(publishedAfter).utc().format("YYYY-MM-DDTHH:mm:ss") + "Z"
+              : undefined
+            }),
+          });
+      
+          const data = await response.json();
+          console.log(data); 
+          return data as Video[];  
+        } catch (err) {
+          console.error("Error al hacer la petición:", err);
+          return [];
+        }
       }
+      
+      return [];
+    
     };
     
     const handleSearch = async () => {
-      const data = await buscarVideos({
-        includeWords,
-        search,
-        excludeWords,
+      const data = await buscarVideos({ 
+        search, 
         regionCode,
         language,
         publishedAfter 
@@ -144,6 +143,22 @@ const Dashboard = () => {
     
     console.log(tagsInWords.join(","))
  
+    const validateParameters = () => {
+      var isValidate;
+      if(regionCode.trim() === "")
+      {
+        toast.error("Should Select Language");
+        isValidate = false;
+      }
+      if(regionCode.trim() === "")
+      {
+        toast.error("Should Select Country");
+        isValidate = false;
+      }
+      isValidate = true;
+      console.log(isValidate)
+      return isValidate;
+    }
 
     // console.log(search + ","  + includeWords,excludeWords,language,regionCode,dayjs(publishedAfter).utc().format("YYYY-MM-DDTHH:mm:ss") + "Z")
 
@@ -161,6 +176,11 @@ const Dashboard = () => {
                   size="small"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}  
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      backgroundColor: 'transparent',
+                    }
+                  }} 
                />
             <Button variant="contained" onClick={handleSearch}>
             Search

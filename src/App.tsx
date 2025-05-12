@@ -8,6 +8,7 @@ import Dashboard from "./Dashboard/Dashboard";
  
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Toaster } from "react-hot-toast";
 
 const darkTheme = createTheme({
   palette: {
@@ -29,6 +30,7 @@ export default function App() {
         </Routes>
       </AppLayout>
     </BrowserRouter>
+    <Toaster position="top-right" />
   </ThemeProvider>
   );
 }
