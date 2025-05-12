@@ -18,9 +18,9 @@ const Topbar = () => {
 <header className="bg-gradient-to-r from-[#121212] to-red-900 px-4 py-3 flex justify-between items-center">
 <div>
         <h1 className="text-xl font-semibold">
-          {(pathname === "/menus" || pathname.includes("tasks")) && "Create Notification 🔔" }
+          {(pathname === "/Notification" || pathname.includes("tasks")) && "Create Notification 🔔" }
           {pathname === "/" && "Search 🔎 "} 
-          {pathname === "/qr" && "Tag filter 🏷️"}  
+          {pathname === "/TagFilter" && "Tag filter 🏷️"}  
         </h1>
       </div>
       
