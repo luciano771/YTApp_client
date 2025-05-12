@@ -1,5 +1,7 @@
 import { useLocation } from "react-router-dom"; 
 import BuyMeCoffeButton from "../components/BuyMeCoffeButton.tsx";
+import { red } from "@mui/material/colors";
+import Logo from "../components/Logo.tsx";
 const Topbar = () => {
   const { pathname } = useLocation();
   // const navigate = useNavigate();
@@ -25,9 +27,7 @@ const Topbar = () => {
       
       <div style={{display:"flex",gap:"50px",alignItems:"center",justifyItems:"center",fontFamily:"cursive"}}> 
         <BuyMeCoffeButton/> 
-        <h1 className="text-xl font-semibold">
-          TubeExplore 🚀
-        </h1>
+        <Logo/>
       </div>
        
       
